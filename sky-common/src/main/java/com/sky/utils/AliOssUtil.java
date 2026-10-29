@@ -4,9 +4,12 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
+import com.sky.constant.MessageConstant;
+import com.sky.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 
 @Data
@@ -27,42 +30,23 @@ public class AliOssUtil {
      * @return
      */
     public String upload(byte[] bytes, String objectName) {
-
-        // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-
+        OSS ossClient = null;
         try {
-            // 创建PutObject请求。
+            // 创建OSSClient实例并上传文件
+            ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
             ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(bytes));
-        } catch (OSSException oe) {
-            System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                    + "but was rejected with an error response for some reason.");
-            System.out.println("Error Message:" + oe.getErrorMessage());
-            System.out.println("Error Code:" + oe.getErrorCode());
-            System.out.println("Request ID:" + oe.getRequestId());
-            System.out.println("Host ID:" + oe.getHostId());
-        } catch (ClientException ce) {
-            System.out.println("Caught an ClientException, which means the client encountered "
-                    + "a serious internal problem while trying to communicate with OSS, "
-                    + "such as not being able to access the network.");
-            System.out.println("Error Message:" + ce.getMessage());
+        } catch (Exception e) {
+            log.error("OSS文件上传失败，objectName={}", objectName, e);
+            throw new BaseException(MessageConstant.UPLOAD_FAILED, e);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
             }
         }
 
-        //文件访问路径规则 https://BucketName.Endpoint/ObjectName
-        StringBuilder stringBuilder = new StringBuilder("https://");
-        stringBuilder
-                .append(bucketName)
-                .append(".")
-                .append(endpoint)
-                .append("/")
-                .append(objectName);
-
-        log.info("文件上传到:{}", stringBuilder.toString());
-
-        return stringBuilder.toString();
+        // 文件访问路径规则 https://BucketName.Endpoint/ObjectName
+        String filePath = "https://" + bucketName + "." + endpoint + "/" + objectName;
+        log.info("文件上传到:{}", filePath);
+        return filePath;
     }
 }

@@ -6,6 +6,7 @@ import com.sky.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 
@@ -25,6 +26,17 @@ public class GlobalExceptionHandler {
     public Result exceptionHandler(BaseException ex){
         log.error("异常信息：{}", ex.getMessage());
         return Result.error(ex.getMessage());
+    }
+
+    /**
+     * 处理上传文件超过大小限制的异常
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler
+    public Result exceptionHandler(MaxUploadSizeExceededException ex){
+        log.error("上传文件过大：{}", ex.getMessage());
+        return Result.error(MessageConstant.UPLOAD_FILE_TOO_LARGE);
     }
 
     /**
