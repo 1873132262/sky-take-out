@@ -14,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -61,13 +62,8 @@ public class HttpClientUtil {
             }
         }catch (Exception e){
             e.printStackTrace();
-        }finally {
-            try {
-                response.close();
-                httpClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } finally {
+            closeQuietly(response, httpClient);
         }
 
         return result;
@@ -110,11 +106,7 @@ public class HttpClientUtil {
         } catch (Exception e) {
             throw e;
         } finally {
-            try {
-                response.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            closeQuietly(response, httpClient);
         }
 
         return resultString;
@@ -160,15 +152,23 @@ public class HttpClientUtil {
         } catch (Exception e) {
             throw e;
         } finally {
-            try {
-                response.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            closeQuietly(response, httpClient);
         }
 
         return resultString;
     }
+    private static void closeQuietly(Closeable... resources) {
+        for (Closeable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     private static RequestConfig builderRequestConfig() {
         return RequestConfig.custom()
                 .setConnectTimeout(TIMEOUT_MSEC)
