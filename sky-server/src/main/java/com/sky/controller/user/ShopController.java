@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.sky.constant.RedisConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.result.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -14,14 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ShopController {
 
-    private static final String SHOP_STATUS_KEY = "SHOP_STATUS";
-
     @Autowired
-    private RedisTemplate<String, Integer> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @GetMapping("/status")
     public Result<Integer> getStatus() {
-        Integer status = redisTemplate.opsForValue().get(SHOP_STATUS_KEY);
+        Integer status = (Integer) redisTemplate.opsForValue().get(RedisConstant.SHOP_STATUS_KEY);
         if (status == null) {
             status = StatusConstant.DISABLE;
         }
