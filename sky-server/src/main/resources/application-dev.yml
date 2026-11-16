@@ -10,6 +10,10 @@ sky:
     appid: wx72426b9135e4aa03
     secret: 2e1fb807d26edab1e9480985be1321a2
 
+  pay:
+    # 个人开发阶段开启：跳过微信支付，直接按支付成功处理
+    mock-enabled: true
+
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: ${ALIYUN_OSS_ACCESS_KEY_ID}

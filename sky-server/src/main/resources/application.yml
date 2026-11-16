@@ -57,3 +57,6 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  pay:
+    # 开发阶段没有微信支付商户号时可开启模拟支付；生产环境必须为 false
+    mock-enabled: false
